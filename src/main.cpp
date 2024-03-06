@@ -14,6 +14,7 @@
 //Para incluir dar quickfix e adicionar isso C:\MinGW\lib\gcc\mingw32\6.3.0\include\c++\mingw32
 #include <stack>
 #include <set>
+#include<list>
 
 using namespace std;
 
@@ -28,12 +29,14 @@ int ***grid;
 int directions[9][2] = {{0, 0}, {1, 0}, {0, 1}, {-1, 0}, {0, -1}, {-1, -1}, {1, 1}, {1, -1}, {-1, 1}};
 int maxSteps = 10;
 int levelToShow=0;
+list<int> indexToRemove;
 
 enum TileType {
     Wall = 1,
     Door,
     Floor,
-    Corridor
+    Corridor,
+    ClosedDoor
 };
 
 // Creating a shortcut for int, int pair type
@@ -54,9 +57,10 @@ struct cell {
     double f, g, h;
 };
 
-vector<vector<pair<pair<int,int>,pair<int,int>>>> Graphs;
-vector<pair<pair<int,int>,pair<int,int>>> graph;
-pair<pair<int,int>,pair<int,int>> node;
+vector<vector<pair<pair<pair<int, int>, pair<int, int>>, int>>> Graphs;
+vector<pair<pair<pair<int, int>, pair<int, int>>, int>> graph;
+// pair(pair(positionXY,roomSizeHW),numberOfOpenedDoors)
+pair<pair<pair<int,int>,pair<int,int>>,int> node;
  
 // A Utility Function to check whether given cell (row, col)
 // is a valid cell or not.
@@ -73,7 +77,7 @@ bool isValid(int row, int col)
 bool isUnBlocked(int** grid, int row, int col)
 {
     // Returns true if the cell is not blocked else false
-    if (grid[row][col] == TileType::Wall)
+    if (grid[row][col] == TileType::Wall || grid[row][col] == TileType::ClosedDoor)
         return (false);
     else
         return (true);
@@ -121,8 +125,12 @@ void tracePath(cell** cellDetails, Pair dest, int level)
     while (!Path.empty()) {
         pair<int, int> p = Path.top();
         Path.pop();
+        
         if(grid[level][p.first][p.second] != TileType::Door && grid[level][p.first][p.second] != TileType::Floor)
             grid[level][p.first][p.second] = TileType::Corridor;
+        if (grid[level][p.first][p.second] == TileType::Door) {
+            grid[level][p.first][p.second] = TileType::ClosedDoor;
+        }
     }
  
     return;
@@ -401,11 +409,11 @@ void CreateRooms(int nivel, int numOfRooms)
       if(canMake)
       {
         if(i==0){
-            node = make_pair(make_pair(50,10),make_pair(5,5));
+            node = make_pair(make_pair(make_pair(50,10),make_pair(5,5)),4);
   
             graph.push_back(node);
         }
-        node = make_pair(make_pair(r1,r2),make_pair(randRoomSizeW,randRoomSizeH));
+        node = make_pair(make_pair(make_pair(r1,r2),make_pair(randRoomSizeW,randRoomSizeH)),4);
   
         graph.push_back(node);
         for(int j=-(int)(randRoomSizeW/2);j<(int)(randRoomSizeW/2);j++)
@@ -453,7 +461,7 @@ void printGraph(int levelToShow)
 
     for(int j=0;j<Graphs[levelToShow].size();j++)
     {
-        CV::circleFill(Graphs[levelToShow][j].first.first*5,Graphs[levelToShow][j].first.second*5,4,20);
+        CV::circleFill(Graphs[levelToShow][j].first.first.first*5,Graphs[levelToShow][j].first.first.second*5,4,20);
     }
     
 }
@@ -515,26 +523,57 @@ void render()
       {
          if(grid[levelToShow][i][j] == 1){
             CV::color(0,0,0);
-            CV::rectFill(i * 5,j * 5,(i+1) * 5,(j+1) * 5);
+            CV::rectFill(i ,j,(i+1) ,(j+1) );
          }
          if(grid[levelToShow][i][j] == 3){
             CV::color(0.8,0.5,0.2);
-            CV::rectFill(i * 5,j * 5,(i+1) * 5,(j+1) * 5);
+            CV::rectFill(i ,j ,(i+1) ,(j+1) );
          }
-         if(grid[levelToShow][i][j] == 2){
+         if(grid[levelToShow][i][j] == 2 || grid[levelToShow][i][j] == TileType::ClosedDoor){
             CV::color(1,0,0);
-            CV::rectFill(i * 5,j * 5,(i+1) * 5,(j+1) * 5);
+            CV::rectFill(i ,j ,(i+1) ,(j+1));
          }
          if(grid[levelToShow][i][j] == 4){
             CV::color(1,0,1);
-            CV::rectFill(i * 5,j * 5,(i+1) * 5,(j+1) * 5);
+            CV::rectFill(i ,j ,(i+1),(j+1));
          }
       }
    }
    
-   //printGraph(levelToShow);
+   printGraph(levelToShow);
 
 }
+/*
+void render()
+{
+
+    for (int i = 0; i < 999; i++)
+    {
+        for (int j = 0; j < 999; j++)
+        {
+            if (grid[levelToShow][i][j] == 1) {
+                CV::color(0, 0, 0);
+                CV::rectFill(i * 5, j * 5, (i + 1) * 5, (j + 1) * 5);
+            }
+            if (grid[levelToShow][i][j] == 3) {
+                CV::color(0.8, 0.5, 0.2);
+                CV::rectFill(i * 5, j * 5, (i + 1) * 5, (j + 1) * 5);
+            }
+            if (grid[levelToShow][i][j] == 2 || grid[levelToShow][i][j] == TileType::ClosedDoor) {
+                CV::color(1, 0, 0);
+                CV::rectFill(i * 5, j * 5, (i + 1) * 5, (j + 1) * 5);
+            }
+            if (grid[levelToShow][i][j] == 4) {
+                CV::color(1, 0, 1);
+                CV::rectFill(i * 5, j * 5, (i + 1) * 5, (j + 1) * 5);
+            }
+        }
+    }
+
+    printGraph(levelToShow);
+
+}*/
+
 
 //funcao chamada toda vez que uma tecla for pressionada.
 void keyboard(int key)
@@ -573,33 +612,113 @@ void mouse(int button, int state, int wheel, int direction, int x, int y)
 
   
 }
+//TODO
+/*
+void cleanNotConectedNodes(vector<pair<pair<pair<int, int>, pair<int, int>>, int>>& pGraph)
+{
+    for (int i = 0; i < pGraph.size(); i++)
+    {
+        for (int j = -(int)(pGraph / 2); j < (int)(randRoomSizeW / 2); j++)
+        {
+            for (int k = -(int)(randRoomSizeH / 2); k < (int)(randRoomSizeH / 2); k++)
+            {
+                grid[nivel][j + r1][k + r2] = TileType::Floor;
+            }
+        }
 
-void findAllCorridors(vector<pair<pair<int,int>,pair<int,int>>> pGraph, Pair nodeToStart, int level)
+        for (int j = -(int)(randRoomSizeW / 2); j <= (int)(randRoomSizeW / 2); j++)
+        {
+            if (j == 0)
+            {
+                grid[nivel][j + r1][r2 - (int)(randRoomSizeH / 2)] = TileType::Door;
+                grid[nivel][j + r1][r2 + (int)(randRoomSizeH / 2)] = TileType::Door;
+            }
+            else
+            {
+                grid[nivel][j + r1][r2 - (int)(randRoomSizeH / 2)] = TileType::Wall;
+                grid[nivel][j + r1][r2 + (int)(randRoomSizeH / 2)] = TileType::Wall;
+            }
+
+        }
+
+        for (int k = -(int)(randRoomSizeH / 2); k <= (int)(randRoomSizeH / 2); k++)
+        {
+            if (k == 0)
+            {
+                grid[nivel][r1 - (int)(randRoomSizeW / 2)][r2 + k] = TileType::Door;
+                grid[nivel][r1 + (int)(randRoomSizeW / 2)][r2 + k] = TileType::Door;
+            }
+            else
+            {
+                grid[nivel][r1 - (int)(randRoomSizeW / 2)][r2 + k] = TileType::Wall;
+                grid[nivel][r1 + (int)(randRoomSizeW / 2)][r2 + k] = TileType::Wall;
+            }
+
+        }
+
+    }
+}
+*/
+
+
+void updateDoorsClosedNumber(pair<pair<pair<int, int>, pair<int, int>>, int>& Room, int level) {
+    int numOfOpenedDoors = 4;
+    
+    Pair pos = Room.first.first;
+    Pair size = Room.first.second;
+    if (grid[level][(int)pos.first + (size.first/2)][pos.second] == TileType::ClosedDoor) {
+        numOfOpenedDoors--;
+    }
+    if (grid[level][pos.first - (size.first / 2)][pos.second] == TileType::ClosedDoor) {
+        numOfOpenedDoors--;
+    }
+    if (grid[level][pos.first][pos.second - (size.second / 2)] == TileType::ClosedDoor) {
+        numOfOpenedDoors--;
+    }
+    if (grid[level][pos.first][pos.second + (size.second / 2)] == TileType::ClosedDoor) {
+        numOfOpenedDoors--;
+    }
+    
+    Room.second = numOfOpenedDoors;
+}
+
+void findAllCorridors(vector<pair<pair<pair<int, int>, pair<int, int>>, int>>& pGraph, Pair nodeToStart, int level)
 {
     
-    if(pGraph.size() < 1){
+    if(pGraph.size() < 0){
         return;
     }
     
     Pair closestNode;
     
     double lastDistance=100000000000.0;
-    int indexToRemove;
+    float max_dist = 40.0;
+
     for(int k=0;k<pGraph.size();k++)
     {
-        double currDistance = calculateHValue(nodeToStart.first,nodeToStart.second,pGraph[k].first);
+        double currDistance = calculateHValue(nodeToStart.first,nodeToStart.second,pGraph[k].first.first);
+        //cout << currDistance << endl;
+        if (currDistance > max_dist) {
+            continue;
+        }
+        updateDoorsClosedNumber(pGraph[k], level);
+        if (pGraph[k].second == 0) {
+            pGraph.erase(pGraph.begin() + k);
+            continue;
+        }
         if(currDistance < lastDistance){
-            closestNode = pGraph[k].first;
+            closestNode = pGraph[k].first.first;
+
             lastDistance = currDistance;
-            indexToRemove=k;
+  
+            aStarSearch(grid[level], nodeToStart, closestNode, level);
+            
+            pGraph.erase(pGraph.begin() + k);
+     
+            findAllCorridors(pGraph, closestNode, level);
         }
     }
-    pGraph.erase(pGraph.begin() + indexToRemove);
     
-    //std::cout << nodeToStart.first << closestNode.first << std::endl;
-    aStarSearch(grid[level], nodeToStart, closestNode,level);
-    //std::cout << pGraph.size() << std::endl;
-    findAllCorridors(pGraph,closestNode,level);
    
     
 }
@@ -624,7 +743,7 @@ int main(void)
     {
         CreateRooms(i, NUM_ROOMS);
         Graphs.push_back(graph);
-        findAllCorridors(graph,graph[0].first,i);
+        findAllCorridors(Graphs[i], Graphs[i][0].first.first,i);
         std::cout << "saiu" << std::endl;
         graph.clear();
             
