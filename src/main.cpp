@@ -19,6 +19,7 @@ using namespace std;
 
 #define ROW 1000
 #define COL 1000
+#define NUM_ROOMS 30
 //variavel global para selecao do que sera exibido na canvas.
 int opcao  = 50;
 int screenWidth = 1000, screenHeight = 1000; //largura e altura inicial da tela . Alteram com o redimensionamento de tela.
@@ -28,7 +29,12 @@ int directions[9][2] = {{0, 0}, {1, 0}, {0, 1}, {-1, 0}, {0, -1}, {-1, -1}, {1, 
 int maxSteps = 10;
 int levelToShow=0;
 
-
+enum TileType {
+    Wall = 1,
+    Door,
+    Floor,
+    Corridor
+};
 
 // Creating a shortcut for int, int pair type
 typedef pair<int, int> Pair;
@@ -67,7 +73,7 @@ bool isValid(int row, int col)
 bool isUnBlocked(int** grid, int row, int col)
 {
     // Returns true if the cell is not blocked else false
-    if (grid[row][col] == 1)
+    if (grid[row][col] == TileType::Wall)
         return (false);
     else
         return (true);
@@ -115,8 +121,8 @@ void tracePath(cell** cellDetails, Pair dest, int level)
     while (!Path.empty()) {
         pair<int, int> p = Path.top();
         Path.pop();
-        if(grid[level][p.first][p.second] != 2 && grid[level][p.first][p.second] != 3)
-            grid[level][p.first][p.second] = 4;
+        if(grid[level][p.first][p.second] != TileType::Door && grid[level][p.first][p.second] != TileType::Floor)
+            grid[level][p.first][p.second] = TileType::Corridor;
     }
  
     return;
@@ -404,23 +410,23 @@ void CreateRooms(int nivel, int numOfRooms)
         graph.push_back(node);
         for(int j=-(int)(randRoomSizeW/2);j<(int)(randRoomSizeW/2);j++)
         {
-        for(int k=-(int)(randRoomSizeH/2);k<(int)(randRoomSizeH/2);k++)
-        {
-            grid[nivel][j+r1][k+r2]=3;
-        }
+            for(int k=-(int)(randRoomSizeH/2);k<(int)(randRoomSizeH/2);k++)
+            {
+                grid[nivel][j+r1][k+r2]= TileType::Floor;
+            }
         }
         
         for(int j=-(int)(randRoomSizeW/2);j<=(int)(randRoomSizeW/2);j++)
         {
-        if(j==0)
-        {
-            grid[nivel][j+r1][r2-(int)(randRoomSizeH/2)]=2;
-            grid[nivel][j+r1][r2+(int)(randRoomSizeH/2)]=2;
-        }else
-        {
-            grid[nivel][j+r1][r2-(int)(randRoomSizeH/2)]=1;
-            grid[nivel][j+r1][r2+(int)(randRoomSizeH/2)]=1;
-        }
+            if(j==0)
+            {
+                grid[nivel][j+r1][r2-(int)(randRoomSizeH/2)]= TileType::Door;
+                grid[nivel][j+r1][r2+(int)(randRoomSizeH/2)]= TileType::Door;
+            }else
+            {
+                grid[nivel][j+r1][r2-(int)(randRoomSizeH/2)]= TileType::Wall;
+                grid[nivel][j+r1][r2+(int)(randRoomSizeH/2)]= TileType::Wall;
+            }
         
         }
 
@@ -428,12 +434,12 @@ void CreateRooms(int nivel, int numOfRooms)
         {
         if(k==0)
         {
-            grid[nivel][r1-(int)(randRoomSizeW/2)][r2+k]=2;
-            grid[nivel][r1+(int)(randRoomSizeW/2)][r2+k]=2;
+            grid[nivel][r1-(int)(randRoomSizeW/2)][r2+k]= TileType::Door;
+            grid[nivel][r1+(int)(randRoomSizeW/2)][r2+k]= TileType::Door;
         }else
         {
-            grid[nivel][r1-(int)(randRoomSizeW/2)][r2+k]=1;
-            grid[nivel][r1+(int)(randRoomSizeW/2)][r2+k]=1;
+            grid[nivel][r1-(int)(randRoomSizeW/2)][r2+k]= TileType::Wall;
+            grid[nivel][r1+(int)(randRoomSizeW/2)][r2+k]= TileType::Wall;
         }
         
         }
@@ -461,19 +467,19 @@ void spawnStartAndStairs()
         {
             for(int k=-(int)(5/2);k<(int)(5/2);k++)
             {
-                grid[i][j+50][k+10]=3;
+                grid[i][j+50][k+10]= TileType::Floor;
             }
         }
         for(int j=-(int)(5/2);j<=(int)(5/2);j++)
         {
             if(j==0)
             {
-                grid[i][j+50][10-(int)(5/2)]=2;
-                grid[i][j+50][10+(int)(5/2)]=2;
+                grid[i][j+50][10-(int)(5/2)]= TileType::Door;
+                grid[i][j+50][10+(int)(5/2)]= TileType::Door;
             }else
             {
-                grid[i][j+50][10-(int)(5/2)]=1;
-                grid[i][j+50][10+(int)(5/2)]=1;
+                grid[i][j+50][10-(int)(5/2)]= TileType::Wall;
+                grid[i][j+50][10+(int)(5/2)]= TileType::Wall;
             }
         
         }
@@ -482,12 +488,12 @@ void spawnStartAndStairs()
         {
             if(k==0)
             {
-                grid[i][50-(int)(5/2)][10+k]=2;
-                grid[i][50+(int)(5/2)][10+k]=2;
+                grid[i][50-(int)(5/2)][10+k]= TileType::Door;
+                grid[i][50+(int)(5/2)][10+k]= TileType::Door;
             }else
             {
-                grid[i][50-(int)(5/2)][10+k]=1;
-                grid[i][50+(int)(5/2)][10+k]=1;
+                grid[i][50-(int)(5/2)][10+k]= TileType::Wall;
+                grid[i][50+(int)(5/2)][10+k]= TileType::Wall;
             }
         }
     }
@@ -509,19 +515,19 @@ void render()
       {
          if(grid[levelToShow][i][j] == 1){
             CV::color(0,0,0);
-            CV::rectFill(i,j,(i+1),(j+1));
+            CV::rectFill(i * 5,j * 5,(i+1) * 5,(j+1) * 5);
          }
          if(grid[levelToShow][i][j] == 3){
             CV::color(0.8,0.5,0.2);
-            CV::rectFill(i,j,(i+1),(j+1));
+            CV::rectFill(i * 5,j * 5,(i+1) * 5,(j+1) * 5);
          }
          if(grid[levelToShow][i][j] == 2){
             CV::color(1,0,0);
-            CV::rectFill(i,j,(i+1),(j+1));
+            CV::rectFill(i * 5,j * 5,(i+1) * 5,(j+1) * 5);
          }
          if(grid[levelToShow][i][j] == 4){
             CV::color(1,0,1);
-            CV::rectFill(i,j,(i+1),(j+1));
+            CV::rectFill(i * 5,j * 5,(i+1) * 5,(j+1) * 5);
          }
       }
    }
@@ -616,7 +622,7 @@ int main(void)
     spawnStartAndStairs();
     for(int i=0;i<3;i++)
     {
-        CreateRooms(i, 300);
+        CreateRooms(i, NUM_ROOMS);
         Graphs.push_back(graph);
         findAllCorridors(graph,graph[0].first,i);
         std::cout << "saiu" << std::endl;
