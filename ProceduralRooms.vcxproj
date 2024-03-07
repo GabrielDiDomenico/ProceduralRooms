@@ -148,10 +148,15 @@
     <ClInclude Include="include\GL\freeglut_ext.h" />
     <ClInclude Include="include\GL\freeglut_std.h" />
     <ClInclude Include="include\GL\glut.h" />
+    <ClInclude Include="src\AstarSearch.h" />
+    <ClInclude Include="src\CreateRooms.h" />
     <ClInclude Include="src\gl_canvas2d.h" />
+    <ClInclude Include="src\TileTypeEnum.h" />
     <ClInclude Include="src\Vector2.h" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\AstarSearch.cpp" />
+    <ClCompile Include="src\CreateRooms.cpp" />
     <ClCompile Include="src\gl_canvas2d.cpp" />
     <ClCompile Include="src\main.cpp" />
   </ItemGroup>
