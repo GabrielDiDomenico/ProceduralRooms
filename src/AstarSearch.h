@@ -1,16 +1,22 @@
 #ifndef __ASTARSEARCH__H__
 #define __ASTARSEARCH__H__
 
+
 #include <iostream>
+#include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <cstdlib>
 #include <time.h>  
 #include <vector>
+#include "float.h"
 
+//Para incluir dar quickfix e adicionar isso C:\MinGW\lib\gcc\mingw32\6.3.0\include\c++\mingw32
 #include <stack>
 #include <set>
 #include<list>
+#include "TileTypeEnum.h"
+#include "AstarSearch.h"
 #include "TileTypeEnum.h"
 using namespace std;
 

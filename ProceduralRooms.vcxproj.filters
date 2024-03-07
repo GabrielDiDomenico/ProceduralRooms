@@ -66,5 +66,8 @@
   <ItemGroup>
     <None Include="freeglut.dll" />
     <None Include="glfw3.dll" />
+    <None Include="make.bat">
+      <Filter>Arquivos de Origem</Filter>
+    </None>
   </ItemGroup>
 </Project>

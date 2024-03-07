@@ -361,3 +361,8 @@ MigrationBackup/
 
 # Fody - auto-generated XML schema
 FodyWeavers.xsd
+/app.exe
+/AstarSearch.o
+/CreateRooms.o
+/gl_canvas2d.o
+/main.o
