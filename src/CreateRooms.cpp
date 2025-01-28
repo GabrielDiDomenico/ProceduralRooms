@@ -189,7 +189,6 @@ void CreateRooms::CleanNotConectedNodes(vector<pair<pair<pair<int, int>, pair<in
     }
 }
 
-
 void CreateRooms::UpdateDoorsClosedNumber(pair<pair<pair<int, int>, pair<int, int>>, int>& Room, int level)
 {
     int numOfOpenedDoors = 4;

@@ -12,14 +12,10 @@ To test this code run the make file so all depencies are called correctly
 */
 
 
-
-
 #include <GL/glut.h>
 #include <GL/freeglut_ext.h> //callback da wheel do mouse.
 
 #include "gl_canvas2d.h"
-
-//Para incluir dar quickfix e adicionar isso C:\MinGW\lib\gcc\mingw32\6.3.0\include\c++\mingw32
 
 #include "CreateRooms.h"
 
@@ -114,7 +110,7 @@ void mouse(int button, int state, int wheel, int direction, int x, int y)
 int main(void)
 {
     
-    rooms = new CreateRooms(1000,1000,30,5);
+    rooms = new CreateRooms(1000,1000,1,5);
 
     
     CV::init(&screenWidth, &screenHeight, "Teste da matriz");

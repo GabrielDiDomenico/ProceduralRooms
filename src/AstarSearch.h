@@ -31,11 +31,7 @@ class AstarSearch
 public:
 	
 
-	AstarSearch(int maxR, int maxC, int*** &g) {
-		maxRow = maxR;
-		maxCol = maxC;
-		grid = g;
-	}
+	AstarSearch(int maxR, int maxC, int***& g);
 	//I used goto in the function, if it is in the language it is meant to be used :)
 	//All jokes aside I don't know the risks of using it, but it works
 	void aStarSearch(int** grid, Pair src, Pair dest, int level);

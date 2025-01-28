@@ -3,6 +3,11 @@
 
 using namespace std;
 
+AstarSearch::AstarSearch(int maxR, int maxC, int***& g) {
+    maxRow = maxR;
+    maxCol = maxC;
+    grid = g;
+}
 
 bool AstarSearch::isValid(int row, int col)
 {
