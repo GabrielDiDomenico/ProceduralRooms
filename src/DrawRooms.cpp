@@ -1,14 +1,25 @@
+/**
+*
+*   Autor: Gabriel Di Domenico
+*
+*   gddomenico@inf.ufsm.br
+*
+**/
+
 #include "DrawRooms.h"
 #include <TileTypeEnum.h>
 
 using namespace std;
 
-DrawRooms::DrawRooms(int***& g, int w, int h, int l) {
+DrawRooms::DrawRooms(int***& g, int w, int h, int l, int z) {
 	grid = g;
     gridHeight = h;
     gridWidth = w;
     maxLevels = l;
     levelToShow = 0;
+    zoom = z;
+    shiftRightLeft = 0;
+    shiftUpDown = 0;
 }
 
 void DrawRooms::DrawRoomsOnCanvas() {
@@ -18,19 +29,19 @@ void DrawRooms::DrawRoomsOnCanvas() {
         {
             if (grid[levelToShow][i][j] == TileType::Wall) {
                 CV::color(0, 0, 0);
-                CV::rectFill(i * 5, j * 5, (i + 1) * 5, (j + 1) * 5);
+                CV::rectFill((i + shiftUpDown) * zoom, (j + shiftRightLeft) * zoom, (i + shiftUpDown + 1) * zoom, (j + shiftRightLeft + 1) * zoom);
             }
             if (grid[levelToShow][i][j] == TileType::Floor) {
                 CV::color(0.8, 0.5, 0.2);
-                CV::rectFill(i * 5, j * 5, (i + 1) * 5, (j + 1) * 5);
+                CV::rectFill((i + shiftUpDown) * zoom, (j + shiftRightLeft) * zoom, (i + shiftUpDown + 1) * zoom, (j + shiftRightLeft + 1) * zoom);
             }
             if (grid[levelToShow][i][j] == TileType::Door || grid[levelToShow][i][j] == TileType::ClosedDoor) {
                 CV::color(1, 0, 0);
-                CV::rectFill(i * 5, j * 5, (i + 1) * 5, (j + 1) * 5);
+                CV::rectFill((i + shiftUpDown) * zoom, (j + shiftRightLeft) * zoom, (i + shiftUpDown + 1) * zoom, (j + shiftRightLeft + 1) * zoom);
             }
             if (grid[levelToShow][i][j] == TileType::Corridor) {
                 CV::color(1, 0, 1);
-                CV::rectFill(i * 5, j * 5, (i + 1) * 5, (j + 1) * 5);
+                CV::rectFill((i + shiftUpDown) * zoom, (j + shiftRightLeft) * zoom, (i + shiftUpDown + 1) * zoom, (j + shiftRightLeft + 1) * zoom);
             }
         }
     }
@@ -44,9 +55,7 @@ void DrawRooms::DrawRoomsOnFile() {
     if (filesystem::create_directory(targetDir)) {
         cout << "Pasta criada em: " << targetDir << endl;
     }
-    else {
-        cout << "Falha ao criar a pasta ou ela já existe." << endl;
-    }
+    
     std::string fileName;
 
     for (int lvl = 0; lvl < maxLevels; lvl++) {

@@ -1,5 +1,12 @@
-#include "CreateRooms.h"
+/**
+*
+*   Autor: Gabriel Di Domenico
+*
+*   gddomenico@inf.ufsm.br
+*
+**/
 
+#include "CreateRooms.h"
 
 using namespace std;
 
@@ -46,106 +53,79 @@ int*** CreateRooms::GetGrid() {
     return grid;
 }
 
-void CreateRooms::SpawnRooms(int nivel, int numOfRooms)
-{
+void CreateRooms::SpawnRooms(int nivel, int numOfRooms) {
     int numberOfTries = 0;
-    for (int i = 0; i < numOfRooms; i++)
-    {
 
-        int r1 = rand() % numOfRooms * 3 + 20;
-        int r2 = rand() % numOfRooms * 3 + 20;
-
-        bool canMake = true;
-
-        int randRoomSizeH = rand() % 10 + 8;
-        int randRoomSizeW = rand() % 10 + 8;
-        if (randRoomSizeH % 2 != 0)
-            randRoomSizeH++;
-        if (randRoomSizeW % 2 != 0)
-            randRoomSizeW++;
+    for (int i = 0; i < numOfRooms; i++) {
         if (numberOfTries > 100000) {
             numberOfTries = 0;
             continue;
         }
 
-        for (int step = 0; step < maxSteps; step++) {
-            for (int d = 0; d < 9; d++) {
-                int newRow = r1 + directions[d][0] * (step + 1);
-                int newCol = r2 + directions[d][1] * (step + 1);
+        // Geração aleatória de posição e tamanho
+        int r1 = rand() % (numOfRooms * 3) + 20;
+        int r2 = rand() % (numOfRooms * 3) + 20;
+        int roomWidth = (rand() % 10 + 8) | 1;  // Garante tamanho par
+        int roomHeight = (rand() % 10 + 8) | 1;
 
-                if (newRow >= maxRow && newRow < maxRow &&
-                    newCol >= maxCol && newCol < maxCol &&
-                    i != 0 &&
-                    grid[nivel][newRow][newCol] == 1 ||
-                    grid[nivel][newRow][newCol] == 2 ||
-                    grid[nivel][newRow][newCol] == 3)
-                {
-                    canMake = false;
-
-                    i--;
-                    numberOfTries++;
-                    break;
-                }
-            }
-            if (!canMake)
-                break;
+        if (!CanPlaceRoom(nivel, r1, r2, roomWidth, roomHeight)) {
+            i--;
+            numberOfTries++;
+            continue;
         }
 
+        // Criação da sala e adição ao grafo
+        if (i == 0) {
+            graph.emplace_back(std::make_pair(std::make_pair(50, 10), std::make_pair(5, 5)), 4);
+        }
 
-        if (canMake)
-        {
-            if (i == 0) {
-                node = make_pair(make_pair(make_pair(50, 10), make_pair(5, 5)), 4);
+        graph.emplace_back(std::make_pair(std::make_pair(r1, r2), std::make_pair(roomWidth, roomHeight)), 4);
+        PlaceRoom(nivel, r1, r2, roomWidth, roomHeight);
+    }
+}
 
-                graph.push_back(node);
-            }
-            node = make_pair(make_pair(make_pair(r1, r2), make_pair(randRoomSizeW, randRoomSizeH)), 4);
+// Verifica se há espaço disponível para a sala
+bool CreateRooms::CanPlaceRoom(int nivel, int r1, int r2, int width, int height) {
+    for (int step = 0; step < maxSteps; step++) {
+        for (int d = 0; d < 9; d++) {
+            int newRow = r1 + directions[d][0] * (step + 1);
+            int newCol = r2 + directions[d][1] * (step + 1);
 
-            graph.push_back(node);
-            for (int j = -(int)(randRoomSizeW / 2); j < (int)(randRoomSizeW / 2); j++)
-            {
-                for (int k = -(int)(randRoomSizeH / 2); k < (int)(randRoomSizeH / 2); k++)
-                {
-                    grid[nivel][j + r1][k + r2] = TileType::Floor;
-                }
-            }
+            if (newRow < 0 || newRow >= maxRow || newCol < 0 || newCol >= maxCol)
+                return false;
 
-            for (int j = -(int)(randRoomSizeW / 2); j <= (int)(randRoomSizeW / 2); j++)
-            {
-                if (j == 0)
-                {
-                    grid[nivel][j + r1][r2 - (int)(randRoomSizeH / 2)] = TileType::Door;
-                    grid[nivel][j + r1][r2 + (int)(randRoomSizeH / 2)] = TileType::Door;
-                }
-                else
-                {
-                    grid[nivel][j + r1][r2 - (int)(randRoomSizeH / 2)] = TileType::Wall;
-                    grid[nivel][j + r1][r2 + (int)(randRoomSizeH / 2)] = TileType::Wall;
-                }
-
-            }
-
-            for (int k = -(int)(randRoomSizeH / 2); k <= (int)(randRoomSizeH / 2); k++)
-            {
-                if (k == 0)
-                {
-                    grid[nivel][r1 - (int)(randRoomSizeW / 2)][r2 + k] = TileType::Door;
-                    grid[nivel][r1 + (int)(randRoomSizeW / 2)][r2 + k] = TileType::Door;
-                }
-                else
-                {
-                    grid[nivel][r1 - (int)(randRoomSizeW / 2)][r2 + k] = TileType::Wall;
-                    grid[nivel][r1 + (int)(randRoomSizeW / 2)][r2 + k] = TileType::Wall;
-                }
-
+            if (grid[nivel][newRow][newCol] == TileType::Floor ||
+                grid[nivel][newRow][newCol] == TileType::Door ||
+                grid[nivel][newRow][newCol] == TileType::Wall) {
+                return false;
             }
         }
+    }
+    return true;
+}
+
+// Posiciona a sala na grade e define paredes/portas
+void CreateRooms::PlaceRoom(int nivel, int r1, int r2, int width, int height) {
+    // Preenche a sala com chão
+    for (int j = -width / 2; j < width / 2; j++) {
+        for (int k = -height / 2; k < height / 2; k++) {
+            grid[nivel][r1 + j][r2 + k] = TileType::Floor;
+        }
+    }
+
+    // Cria paredes e portas
+    for (int j = -width / 2; j <= width / 2; j++) {
+        grid[nivel][r1 + j][r2 - height / 2] = (j == 0) ? TileType::Door : TileType::Wall;
+        grid[nivel][r1 + j][r2 + height / 2] = (j == 0) ? TileType::Door : TileType::Wall;
+    }
+    for (int k = -height / 2; k <= height / 2; k++) {
+        grid[nivel][r1 - width / 2][r2 + k] = (k == 0) ? TileType::Door : TileType::Wall;
+        grid[nivel][r1 + width / 2][r2 + k] = (k == 0) ? TileType::Door : TileType::Wall;
     }
 }
 
 void CreateRooms::SpawnStartAndStairs()
 {
-
     for (int i = 0; i < maxLevels; i++) {
 
         for (int j = -(int)(5 / 2); j < (int)(5 / 2); j++)
@@ -184,9 +164,6 @@ void CreateRooms::SpawnStartAndStairs()
             }
         }
     }
-
-
-
 }
 
 

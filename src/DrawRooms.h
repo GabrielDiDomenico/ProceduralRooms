@@ -14,10 +14,15 @@ class DrawRooms {
 
 public:
 	int levelToShow;
+	int zoom;
+	int shiftUpDown;
+	int shiftRightLeft;
 
-	DrawRooms(int***& g, int w, int h, int l);
+	DrawRooms(int***& g, int w, int h, int l, int z);
 
+	//Draw the dungeon on the Canvas2D
 	void DrawRoomsOnCanvas();
+	//Save each level on a different text file
 	void DrawRoomsOnFile();
 
 private:

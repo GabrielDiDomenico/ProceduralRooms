@@ -1,3 +1,11 @@
+/**
+*
+*   Autor: Gabriel Di Domenico
+*
+*   gddomenico@inf.ufsm.br
+*
+**/
+
 #include "AstarSearch.h"
 
 using namespace std;
@@ -16,7 +24,6 @@ bool AstarSearch::isValid(int row, int col)
         && (col < maxCol);
 }
 
-
 bool AstarSearch::isUnBlocked(int** grid, int row, int col)
 {
     // Returns true if the cell is not blocked else false
@@ -26,7 +33,6 @@ bool AstarSearch::isUnBlocked(int** grid, int row, int col)
         return (true);
 }
 
-
 bool AstarSearch::isDestination(int row, int col, Pair dest)
 {
     if (row == dest.first && col == dest.second)
@@ -34,7 +40,6 @@ bool AstarSearch::isDestination(int row, int col, Pair dest)
     else
         return (false);
 }
-
 
 float AstarSearch::calculateHValue(int row, int col, Pair dest)
 {
@@ -46,7 +51,6 @@ float AstarSearch::calculateHValue(int row, int col, Pair dest)
 
 void AstarSearch::tracePath(cell** cellDetails, Pair dest, int level)
 {
-
     int row = dest.first;
     int col = dest.second;
 
@@ -100,7 +104,6 @@ void AstarSearch::aStarSearch(int** grid, Pair src, Pair dest, int level)
         return;
     }
 
-
     bool** closedList = (bool**)malloc(maxRow * sizeof(bool*));
     closedList[0] = (bool*)malloc(maxRow * maxCol * sizeof(bool));
     for (int j = 0; j < maxRow; j++)
@@ -110,14 +113,11 @@ void AstarSearch::aStarSearch(int** grid, Pair src, Pair dest, int level)
         for (int j = 0; j < maxCol; j++)
             closedList[i][j] = false;
 
-
     cell** cellDetails = (struct cell**)malloc(maxRow * sizeof(struct cell*));
     cellDetails[0] = (struct cell*)malloc(maxRow * maxCol * sizeof(struct cell));
 
     for (int j = 1; j < maxRow; j++)
         cellDetails[j] = cellDetails[0] + maxCol * j;
-
-
 
     int i, j;
 
@@ -281,12 +281,10 @@ void AstarSearch::aStarSearch(int** grid, Pair src, Pair dest, int level)
         }
     }
 
-
     if (foundDest == false)
         printf("Failed to find the Destination Cell\n");
 
 liberate:
-
     free(cellDetails[0]);
 
     free(cellDetails);
@@ -294,7 +292,6 @@ liberate:
     free(closedList[0]);
 
     free(closedList);
-
 
     return;
 }
