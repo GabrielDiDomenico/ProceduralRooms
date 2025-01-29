@@ -2,6 +2,8 @@
 
 Can create multiple rooms and the corridors are conected using A* algorithm
 
+Generate text files with informations about the dungeon, categorizing each tile with a different symbol. You can create a Dungeon with multiple levels, so is created multiple files for each level generated
+
 I'm using a customized version of the A* algorithm from GeeksforGeeks
 
 To visualize just open the make.bat file (it is safe, I think) it is needed MinGW 32 c++ installed
@@ -16,7 +18,7 @@ Link to the VS Studio Tutorial: https://www.youtube.com/watch?v=ZF59t7HX24s
 
 ## Current/Future Features
 
-- [x]  Can generate dungeons with up to 1000 rooms (maybe more, with luck :D)
+- [x]  Can generate dungeons that contains up to 1000 rooms (maybe more, with luck :D)
 - [x]  Easy visualization of dungeons using Canvas2D
 - [x]  Generate new dungeon on the fly
 - [X]  Import the generated dungeon to a text file
