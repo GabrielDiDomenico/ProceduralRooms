@@ -8,7 +8,7 @@ To visualize just open the make.bat file (it is safe, I think) it is needed MinG
 
 If you want to test you can copy the AstarSearch and CreateRooms files and run in any C++ program.
 
-To edit the code using Canvas2D to visualize you need to use VS Code or VS Studio following the tutorial from my griend Alfredo.
+To edit the code using Canvas2D to visualize you need to use VS Code or VS Studio following the tutorial from my friend Alfredo.
 
 Link to the VS Code tutorial: https://www.youtube.com/watch?v=pU2wzUdGEwY
 
