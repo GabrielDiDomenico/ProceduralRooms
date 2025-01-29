@@ -21,7 +21,8 @@ Link to the VS Studio Tutorial: https://www.youtube.com/watch?v=ZF59t7HX24s
 - [x]  Can generate dungeons that contains up to 1000 rooms (maybe more, with luck :D)
 - [x]  Easy visualization of dungeons using Canvas2D
 - [x]  Generate new dungeon on the fly
-- [X]  Import the generated dungeon to a text file
-- [ ]  Refactor the code to improve readability and ensure it runs without errors across different configurations.
+- [x]  Import the generated dungeon to a text file
+- [x]  Dungeon creation via terminal  
+- [ ]  Add dungeon configuration from terminal
 - [ ]  Adding the possibility to spawn treasures, updates, merchants and enemies
 - [ ]  Increase and decrease enemies spawn based on trasure/update position
