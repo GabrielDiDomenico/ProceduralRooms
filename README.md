@@ -19,6 +19,6 @@ Link to the VS Studio Tutorial: https://www.youtube.com/watch?v=ZF59t7HX24s
 - [x]  Can generate dungeons with up to 1000 rooms (maybe more, with luck :D)
 - [x]  Easy visualization of dungeons using Canvas2D
 - [x]  Generate new dungeon on the fly
-- [ ]  Import the generated dungeon to a text file
+- [X]  Import the generated dungeon to a text file
 - [ ]  Update room search approach, making possible bigger dungeons, the current one relies on rooms being close with each other for the pathfinding algorithm to actually find and connect the rooms
 - [ ]  Update room spawn, the current one is do not consider the area occupied by the rooms, so it's up to the programmer to test how many rooms can fit on the grid, the new planned form take in consideration the available area for each new room
