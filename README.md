@@ -24,3 +24,5 @@ Link to the VS Studio Tutorial: https://www.youtube.com/watch?v=ZF59t7HX24s
 - [X]  Import the generated dungeon to a text file
 - [ ]  Update room search approach, making possible bigger dungeons, the current one relies on rooms being close with each other for the pathfinding algorithm to actually find and connect the rooms
 - [ ]  Update room spawn, the current one is do not consider the area occupied by the rooms, so it's up to the programmer to test how many rooms can fit on the grid, the new planned form take in consideration the available area for each new room
+- [ ]  Adding treasures, Updates, Merchants and Enemies
+- [ ]  Increase and decrease enemies spawn based on trasure/update position
