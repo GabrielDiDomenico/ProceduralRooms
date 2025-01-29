@@ -18,25 +18,38 @@ To test this code run the make file so all depencies are called correctly
 #include "gl_canvas2d.h"
 
 #include "CreateRooms.h"
-
+#include <string>
+#include <iostream>
 
 //variavel global para selecao do que sera exibido na canvas.
 int opcao = 50;
 int screenWidth = 1000, screenHeight = 1000; //largura e altura inicial da tela . Alteram com o redimensionamento de tela.
 int mouseX, mouseY; //variaveis globais do mouse para poder exibir dentro da render().
 int levelToShow = 0;
+int maxGridHeight = 1000;
+int maxGridWidth = 1000;
+int maxLevels = 1;
+int maxRooms = 10;
 CreateRooms* rooms = NULL;
 
 
 void printGraph(int levelToShow)
 {
     CV::color(0, 1, 0);
+    if (rooms->Graphs.size() > 1) {
+        for (int j = 0; j < rooms->Graphs[levelToShow].size(); j++)
+        {
+            CV::circleFill(rooms->Graphs[levelToShow][j].first.first.first * 5, rooms->Graphs[levelToShow][j].first.first.second * 5, 4, 20);
+        }
 
-    for (int j = 0; j < rooms->Graphs[levelToShow].size(); j++)
-    {
-        CV::circleFill(rooms->Graphs[levelToShow][j].first.first.first * 5, rooms->Graphs[levelToShow][j].first.first.second * 5, 4, 20);
+        std::string level = "Level: ";
+
+        std::string levelAndNumber = level + std::to_string(levelToShow);
+        const char* cString = levelAndNumber.c_str();
+        CV::color(0, 0, 0);
+        CV::text(10, 10, cString);
     }
-
+    
 }
 void render()
 {
@@ -75,13 +88,14 @@ void keyboard(int key)
    switch(key)
    {
       case 27:
-         exit(0);
+          rooms->ClearGrid();
+          rooms->InitCreation();
       break;
 
       //seta para a esquerda
       case 200:
          levelToShow++;
-         if(levelToShow==3){
+         if(levelToShow==maxLevels){
             levelToShow=0;
          }
       break;
@@ -110,7 +124,7 @@ void mouse(int button, int state, int wheel, int direction, int x, int y)
 int main(void)
 {
     
-    rooms = new CreateRooms(1000,1000,1,5);
+    rooms = new CreateRooms(maxGridWidth, maxGridHeight, maxRooms, maxLevels);
 
     
     CV::init(&screenWidth, &screenHeight, "Teste da matriz");

@@ -38,37 +38,11 @@ public:
 
 	When it's finished any rooms that could not be conected is removed from the grid.
 	*/
-	CreateRooms(int maxR, int maxC, int numRooms, int numOfLevels) {
-		maxRow = maxR;
-		maxCol = maxC;
-		grid = (int***)malloc(numOfLevels * sizeof(int**));
-		
-		for (int i = 0; i < numOfLevels; i++) {
-			grid[i] = (int**)malloc(maxRow * sizeof(int*));
-			grid[i][0] = (int*)malloc(maxRow * maxCol * sizeof(int));
-			for (int j = 0; j < maxRow; j++)
-				grid[i][j] = grid[i][0] + maxCol * j;
-		}
-		aStar = new AstarSearch(maxR, maxC, grid);
-		srand(time(NULL));
-		for (int k = 0; k < numOfLevels; k++)
-			for (int i = 0; i < maxRow; i++)
-				for (int j = 0; j < maxCol; j++)
-					grid[k][i][j] = 0;
-		SpawnStartAndStairs();
-		for (int i = 0; i < numOfLevels; i++)
-		{
-			SpawnRooms(i, numRooms);
-			Graphs.push_back(graph);
-			findAllCorridors(Graphs[i], Graphs[i][0].first.first, i);
-			CleanNotConectedNodes(Graphs[i], i);
-			graph.clear();
-
-		}
-	}
+	CreateRooms(int maxR, int maxC, int numRooms, int numOfLevels);
 
 	int*** GetGrid();
-	
+	void ClearGrid();
+	void InitCreation();
 private:
 
 	
@@ -83,6 +57,8 @@ private:
 	list<int> indexToRemove;
 	int maxRow;
 	int maxCol;
+	int maxLevels;
+	int maxRooms;
 	AstarSearch* aStar;
 
 	//Create randomly rooms, saving in pairs with position information (X,Y) and size (W,H)
@@ -96,7 +72,7 @@ private:
 	void UpdateDoorsClosedNumber(pair<pair<pair<int, int>, pair<int, int>>, int>& Room, int level);
 	//Function that calculate the distance between the rooms and call the A* search to trace the corridor
 	void findAllCorridors(vector<pair<pair<pair<int, int>, pair<int, int>>, int>>& pGraph, Pair nodeToStart, int level);
-
+	
 };
 
 #endif

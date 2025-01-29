@@ -3,6 +3,45 @@
 
 using namespace std;
 
+CreateRooms::CreateRooms(int maxR, int maxC, int numRooms, int numOfLevels) {
+    maxLevels = numOfLevels;
+    maxRooms = numRooms;
+    maxRow = maxR;
+    maxCol = maxC;
+    grid = (int***)malloc(numOfLevels * sizeof(int**));
+
+    for (int i = 0; i < numOfLevels; i++) {
+        grid[i] = (int**)malloc(maxRow * sizeof(int*));
+        grid[i][0] = (int*)malloc(maxRow * maxCol * sizeof(int));
+        for (int j = 0; j < maxRow; j++)
+            grid[i][j] = grid[i][0] + maxCol * j;
+    }
+    aStar = new AstarSearch(maxR, maxC, grid);
+    srand(time(NULL));
+    ClearGrid();
+    InitCreation();
+}
+
+void CreateRooms::InitCreation() {
+    SpawnStartAndStairs();
+    for (int i = 0; i < maxLevels; i++)
+    {
+        SpawnRooms(i, maxRooms);
+        Graphs.push_back(graph);
+        findAllCorridors(Graphs[i], Graphs[i][0].first.first, i);
+        CleanNotConectedNodes(Graphs[i], i);
+        graph.clear();
+    }
+}
+
+void CreateRooms::ClearGrid() {
+    for (int k = 0; k < maxLevels; k++)
+        for (int i = 0; i < maxRow; i++)
+            for (int j = 0; j < maxCol; j++)
+                grid[k][i][j] = 0;
+    Graphs.clear();
+}
+
 int*** CreateRooms::GetGrid() {
     return grid;
 }
@@ -107,7 +146,7 @@ void CreateRooms::SpawnRooms(int nivel, int numOfRooms)
 void CreateRooms::SpawnStartAndStairs()
 {
 
-    for (int i = 0; i < 3; i++) {
+    for (int i = 0; i < maxLevels; i++) {
 
         for (int j = -(int)(5 / 2); j < (int)(5 / 2); j++)
         {
