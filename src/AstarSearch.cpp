@@ -1,6 +1,5 @@
 #include "AstarSearch.h"
 
-
 using namespace std;
 
 AstarSearch::AstarSearch(int maxR, int maxC, int***& g) {

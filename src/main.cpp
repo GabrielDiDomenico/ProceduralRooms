@@ -20,17 +20,18 @@ To test this code run the make file so all depencies are called correctly
 #include "CreateRooms.h"
 #include <string>
 #include <iostream>
+#include <DrawRooms.h>
 
 //variavel global para selecao do que sera exibido na canvas.
 int opcao = 50;
 int screenWidth = 1000, screenHeight = 1000; //largura e altura inicial da tela . Alteram com o redimensionamento de tela.
 int mouseX, mouseY; //variaveis globais do mouse para poder exibir dentro da render().
-int levelToShow = 0;
 int maxGridHeight = 1000;
 int maxGridWidth = 1000;
-int maxLevels = 1;
+int maxLevels = 3;
 int maxRooms = 10;
 CreateRooms* rooms = NULL;
+DrawRooms* drawRooms = NULL;
 
 
 void printGraph(int levelToShow)
@@ -53,32 +54,8 @@ void printGraph(int levelToShow)
 }
 void render()
 {
-
-    for (int i = 0; i < 999; i++)
-    {
-        for (int j = 0; j < 999; j++)
-        {
-            if (rooms->grid[levelToShow][i][j] == 1) {
-                CV::color(0, 0, 0);
-                CV::rectFill(i * 5, j * 5, (i + 1) * 5, (j + 1) * 5);
-            }
-            if (rooms->grid[levelToShow][i][j] == 3) {
-                CV::color(0.8, 0.5, 0.2);
-                CV::rectFill(i * 5, j * 5, (i + 1) * 5, (j + 1) * 5);
-            }
-            if (rooms->grid[levelToShow][i][j] == 2 || rooms->grid[levelToShow][i][j] == TileType::ClosedDoor) {
-                CV::color(1, 0, 0);
-                CV::rectFill(i * 5, j * 5, (i + 1) * 5, (j + 1) * 5);
-            }
-            if (rooms->grid[levelToShow][i][j] == 4) {
-                CV::color(1, 0, 1);
-                CV::rectFill(i * 5, j * 5, (i + 1) * 5, (j + 1) * 5);
-            }
-        }
-    }
-
-    printGraph(levelToShow);
-
+    drawRooms->DrawRoomsOnCanvas();
+    printGraph(drawRooms->levelToShow);
 }
 
 
@@ -87,20 +64,26 @@ void keyboard(int key)
 {
    switch(key)
    {
-      case 27:
+      //Backspace
+      case 8:
           rooms->ClearGrid();
           rooms->InitCreation();
       break;
-
-      //seta para a esquerda
+      //Space
+      case 32:
+          drawRooms->DrawRoomsOnFile();
+          break;
+      //Esc
+      case 27:
+          exit(0);
+          break;
+      //LeftArrow
       case 200:
-         levelToShow++;
-         if(levelToShow==maxLevels){
-            levelToShow=0;
+          drawRooms->levelToShow++;
+         if(drawRooms->levelToShow == maxLevels){
+             drawRooms->levelToShow = 0;
          }
       break;
-
-   
    }  
 }
 
@@ -115,18 +98,12 @@ void mouse(int button, int state, int wheel, int direction, int x, int y)
 {
    mouseX = x; //guarda as coordenadas do mouse para exibir dentro da render()
    mouseY = y;
-
-   //printf("\nmouse %d %d %d %d %d %d", button, state, wheel, direction,  x, y);
-
-  
 }
 
 int main(void)
 {
-    
     rooms = new CreateRooms(maxGridWidth, maxGridHeight, maxRooms, maxLevels);
-
-    
+    drawRooms = new DrawRooms(rooms->grid, maxGridWidth, maxGridHeight, maxLevels);
     CV::init(&screenWidth, &screenHeight, "Teste da matriz");
     CV::run();
 }
