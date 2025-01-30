@@ -61,10 +61,19 @@ void CreateRooms::SpawnRooms(int nivel, int numOfRooms) {
             numberOfTries = 0;
             continue;
         }
-
+        int roomsMultiplier = 1;
         // Geração aleatória de posição e tamanho
-        int r1 = rand() % (numOfRooms * 3) + 20;
-        int r2 = rand() % (numOfRooms * 3) + 20;
+        if (numOfRooms < 100) {
+            roomsMultiplier = 4;
+        }
+        else if (numOfRooms < 300) {
+            roomsMultiplier = 2;
+        }
+        else {
+            roomsMultiplier = 1;
+        }
+        int r1 = rand() % (numOfRooms* roomsMultiplier) + 20;
+        int r2 = rand() % (numOfRooms* roomsMultiplier) + 20;
         int roomWidth = (rand() % 10 + 8) | 1;  // Garante tamanho par
         int roomHeight = (rand() % 10 + 8) | 1;
 

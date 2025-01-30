@@ -83,20 +83,24 @@ void AstarSearch::tracePath(cell** cellDetails, Pair dest, int level)
 void AstarSearch::aStarSearch(int** grid, Pair src, Pair dest, int level)
 {
     if (isValid(src.first, src.second) == false) {
+        cout << "..";
         return;
     }
     if (isValid(dest.first, dest.second) == false) {
+        cout << "..";
         return;
     }
 
     if (isUnBlocked(grid, src.first, src.second) == false
         || isUnBlocked(grid, dest.first, dest.second)
         == false) {
+        cout << "..";
         return;
     }
 
     if (isDestination(src.first, src.second, dest)
         == true) {
+        cout << "..";
         return;
     }
 

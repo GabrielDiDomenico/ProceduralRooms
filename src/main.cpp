@@ -227,8 +227,10 @@ int main(void)
         }
         if (userInput == "w") {
             if (rooms == NULL) {
+                currLang == 0 ? cout << "Creating Dungeon...." : cout << "Criando Dungeon....";
                 rooms = new CreateRooms(maxGridWidth, maxGridHeight, maxRooms, maxLevels);
                 drawRooms = new DrawRooms(rooms->grid, maxGridWidth, maxGridHeight, maxLevels, 1);
+                cout << "\n";
                 currLang == 0 ? cout << "Dungeon Created" << endl : cout << "Dungeon Criada" << endl;
             }
             else {
