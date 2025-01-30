@@ -68,7 +68,6 @@ void render()
 
 void keyboard(int key)
 {
-    cout << key;
    switch(key)
    {
       //Backspace - New Dungeon
