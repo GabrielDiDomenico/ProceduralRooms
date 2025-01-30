@@ -27,6 +27,7 @@ To test this code run the make file so all depencies are called correctly
 #include <string>
 #include <iostream>
 #include <DrawRooms.h>
+#include <regex>
 
 int screenWidth = 1000, screenHeight = 1000; 
 int mouseX, mouseY;
@@ -37,6 +38,7 @@ int maxRooms = 10;
 bool changeLang = false;
 bool currLang = 0;
 string userInput;
+string roomDensity;
 CreateRooms* rooms = NULL;
 DrawRooms* drawRooms = NULL;
 
@@ -105,7 +107,7 @@ void keyboard(int key)
       //z
       case 122:
           drawRooms->zoom++;
-          if (drawRooms->zoom == 6) {
+          if (drawRooms->zoom == 10) {
               drawRooms->zoom = 1;
           }
       break;
@@ -136,6 +138,8 @@ void PrintConsoleInformationEnglish() {
     cout << "\n";
     cout << "Q - Change to PT-BR";
     cout << "\n";
+    cout << "F - Setup Dungeon Grid and Rooms density";
+    cout << "\n";
     cout << "W - Generate Dungeon";
     cout << "\n";
     cout << "S - Save to file";
@@ -150,6 +154,8 @@ void PrintConsoleInformationPortuguese() {
     cout << "\n";
     cout << "Q - Mudar para EN-US";
     cout << "\n";
+    cout << "F - Configurar grid da Dungeon e densidade de salas";
+    cout << "\n";
     cout << "W - Gerar Dungeon";
     cout << "\n";
     cout << "S - Salvar para arquivo";
@@ -158,25 +164,60 @@ void PrintConsoleInformationPortuguese() {
     cout << "\n";
 }
 
+void ConfigurationInfo() {
+    cout << "\n";
+    if (currLang == 0) {
+        cout << "Current Dungeon Configuration: " << maxGridWidth << "x" << maxGridWidth << " "
+            << "Number of levels: " << maxLevels << " "
+            << "Room Density: " << roomDensity << endl;
+    }
+    else {
+        cout << "Configuracao da Dungeon atual: " << maxGridWidth << "x" << maxGridWidth << " "
+            << "Numero de niveis: " << maxLevels << " "
+            << "Quantidade de salas: " << roomDensity << endl;
+    }
+}
+
+
 void ChangeConsoleLanguage() {
     if (changeLang && currLang == 0) {
         system("cls");
         PrintConsoleInformationPortuguese();
+        ConfigurationInfo();
         changeLang = false;
         currLang = 1;
     }
     else {
         system("cls");
         PrintConsoleInformationEnglish();
+        ConfigurationInfo();
         changeLang = false;
         currLang = 0;
     }
 }
 
+bool validateAndExtract(const string& input, int& val1, int& val2, int& val3) {
+    regex pattern(R"((\d+)x(\d+)x(\d+))");
+    smatch match;
+
+    if (regex_match(input, match, pattern)) {
+        val1 = stoi(match[1].str());
+        val2 = stoi(match[2].str());
+        val3 = stoi(match[3].str());
+
+
+        if ((val1 >= 1 && val1 <= 1500) && (val2 >= 1 && val2 <= 50) && (val3 >= 1 && val3 <= 3)) {
+            return true;
+        }
+    }
+    return false;
+}
+
 int main(void)
 {
+    roomDensity = "low";
     PrintConsoleInformationEnglish();
-    
+    ConfigurationInfo();
     while (true) {
         getline(cin, userInput);
 
@@ -203,6 +244,68 @@ int main(void)
         if (rooms != NULL && userInput == "c") {
             CV::init(&screenWidth, &screenHeight, "Teste da matriz");
             CV::run();
+        }
+
+        if (userInput == "f") {
+            cout << "\n";
+            string input;
+            int promptGridSize, promptLevels, promptRooms;
+
+           
+            currLang == 0 ?
+                cout << "Type grid size, level number and density value (1 - low, 2 - medium, 3 - max)" << endl :
+                cout << "Digite tamanho do grid, numro de niveis e o valor de densidade (1 - pouca, 2 - media, 3 - maxima)" << endl;
+            currLang == 0 ?
+                cout << "Type the string using the format(1-1500)x(1x1500)x(1-50)x(1-3): " :
+                cout << "Digite a string no formato (1-1500)x(1x1500)x(1-50)x(1-3): ";
+            
+            while (true) {
+                
+                getline(cin, input);
+
+                if (validateAndExtract(input, promptGridSize, promptLevels, promptRooms)) {
+                    maxGridWidth = promptGridSize;
+                    maxGridHeight = promptGridSize;
+                    maxLevels = promptLevels;
+                    
+                    switch (promptRooms) {
+                        case 1:
+                            maxRooms = promptGridSize*0.1;
+                            currLang == 0 ?
+                                roomDensity = "Low" :
+                                roomDensity = "Baixa";
+                            break;
+                        case 2:
+                            maxRooms = promptGridSize * 0.4;
+                            currLang == 0 ?
+                                roomDensity = "Medium" :
+                                roomDensity = "Media";
+                            break;
+                        case 3:
+                            maxRooms = promptGridSize * 0.8;
+                            currLang == 0 ?
+                                roomDensity = "High" :
+                                roomDensity = "Alta";
+                            break;
+                    }
+                    system("cls");
+                    if (currLang == 0) {
+                        PrintConsoleInformationEnglish();
+                        ConfigurationInfo();
+                    }
+                    else {
+                        PrintConsoleInformationPortuguese();
+                        ConfigurationInfo();
+                    }
+                         
+                    break;
+                }
+                else {
+                    currLang == 0 ?
+                        cout << "Invalid Prompt" << endl :
+                        cout << "Prompt Invalido" << endl;
+                }
+            }
         }
     }
 }

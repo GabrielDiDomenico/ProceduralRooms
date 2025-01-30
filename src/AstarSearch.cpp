@@ -83,24 +83,20 @@ void AstarSearch::tracePath(cell** cellDetails, Pair dest, int level)
 void AstarSearch::aStarSearch(int** grid, Pair src, Pair dest, int level)
 {
     if (isValid(src.first, src.second) == false) {
-        printf("Source is invalid\n");
         return;
     }
     if (isValid(dest.first, dest.second) == false) {
-        printf("Destination is invalid\n");
         return;
     }
 
     if (isUnBlocked(grid, src.first, src.second) == false
         || isUnBlocked(grid, dest.first, dest.second)
         == false) {
-        printf("Source or the destination is blocked\n");
         return;
     }
 
     if (isDestination(src.first, src.second, dest)
         == true) {
-        printf("We are already at the destination\n");
         return;
     }
 
@@ -280,9 +276,6 @@ void AstarSearch::aStarSearch(int** grid, Pair src, Pair dest, int level)
             }
         }
     }
-
-    if (foundDest == false)
-        printf("Failed to find the Destination Cell\n");
 
 liberate:
     free(cellDetails[0]);
