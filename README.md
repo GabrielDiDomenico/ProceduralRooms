@@ -6,7 +6,7 @@ Generate text files with informations about the dungeon, categorizing each tile 
 
 I'm using a customized version of the A* algorithm from GeeksforGeeks
 
-To visualize just open the make.bat file (it is safe, I think) it is needed MinGW 32 c++ installed
+To visualize just open the make.bat file, it is needed GCC with a version superior than 8.0 installed (I'm using <filesystem>). The way I install on windows is by using MSYS, it's not that complicated, just download from [here](https://www.msys2.org/), when done add the path on the ambient variables -> (C:\msys64\ucrt64\bin) 
 
 If you want to test you can copy the AstarSearch and CreateRooms files and run in any C++ program.
 
