@@ -26,7 +26,7 @@ To test this code run the make file so all depencies are called correctly
 #include "CreateRooms.h"
 #include <string>
 #include <iostream>
-#include <DrawRooms.h>
+#include "DrawRooms.h"
 #include <regex>
 
 int screenWidth = 1000, screenHeight = 1000; 
@@ -257,8 +257,8 @@ int main(void)
                 cout << "Type grid size, level number and density value (1 - low, 2 - medium, 3 - max)" << endl :
                 cout << "Digite tamanho do grid, numro de niveis e o valor de densidade (1 - pouca, 2 - media, 3 - maxima)" << endl;
             currLang == 0 ?
-                cout << "Type the string using the format(1-1500)x(1x1500)x(1-50)x(1-3): " :
-                cout << "Digite a string no formato (1-1500)x(1x1500)x(1-50)x(1-3): ";
+                cout << "Use the format(1-1500)x(1-50)x(1-3): " :
+                cout << "Utilize o formato (1-1500)x(1-50)x(1-3): ";
             
             while (true) {
                 
