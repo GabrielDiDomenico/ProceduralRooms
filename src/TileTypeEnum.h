@@ -7,7 +7,9 @@ enum TileType {
     Door,
     Floor,
     Corridor,
-    ClosedDoor
+    ClosedDoor,
+    Treasure,
+	Enemy
 };
 
 

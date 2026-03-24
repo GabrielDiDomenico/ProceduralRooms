@@ -43,6 +43,14 @@ void DrawRooms::DrawRoomsOnCanvas() {
                 CV::color(1, 0, 1);
                 CV::rectFill((i + shiftUpDown) * zoom, (j + shiftRightLeft) * zoom, (i + shiftUpDown + 1) * zoom, (j + shiftRightLeft + 1) * zoom);
             }
+            if (grid[levelToShow][i][j] == TileType::Treasure) {
+                CV::color(1, 1, 0);
+                CV::rectFill((i + shiftUpDown) * zoom, (j + shiftRightLeft) * zoom, (i + shiftUpDown + 1) * zoom, (j + shiftRightLeft + 1) * zoom);
+            }
+            if (grid[levelToShow][i][j] == TileType::Enemy) {
+                CV::color(0, 0, 0);
+                CV::rectFill((i + 1 + shiftUpDown) * zoom, (j + 1 + shiftRightLeft) * zoom, (i + 1 + shiftUpDown + 1) * zoom, (j + 1 + shiftRightLeft + 1) * zoom);
+            }
         }
     }
 }
@@ -76,6 +84,12 @@ void DrawRooms::DrawRoomsOnFile() {
                 }
                 else if (grid[lvl][i][j] == TileType::Corridor) {
                     file << "C";
+                }
+                else if (grid[lvl][i][j] == TileType::Treasure) {
+                    file << "T";
+                }
+                else if (grid[lvl][i][j] == TileType::Enemy) {
+                    file << "E";
                 }
                 else {
                     file << ".";

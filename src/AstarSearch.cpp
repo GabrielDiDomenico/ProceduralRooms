@@ -70,7 +70,7 @@ void AstarSearch::tracePath(cell** cellDetails, Pair dest, int level)
         pair<int, int> p = Path.top();
         Path.pop();
 
-        if (grid[level][p.first][p.second] != TileType::Door && grid[level][p.first][p.second] != TileType::Floor)
+        if (grid[level][p.first][p.second] != TileType::Door && grid[level][p.first][p.second] != TileType::Floor && grid[level][p.first][p.second] != TileType::Treasure && grid[level][p.first][p.second] != TileType::Enemy)
             grid[level][p.first][p.second] = TileType::Corridor;
         if (grid[level][p.first][p.second] == TileType::Door) {
             grid[level][p.first][p.second] = TileType::ClosedDoor;

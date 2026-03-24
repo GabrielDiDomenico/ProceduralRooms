@@ -1,4 +1,4 @@
-/**
+ï»¿/**
 *
 *   Autor: Gabriel Di Domenico
 *
@@ -11,6 +11,7 @@
 using namespace std;
 
 CreateRooms::CreateRooms(int maxR, int maxC, int numRooms, int numOfLevels) {
+    gen = std::mt19937(std::random_device{}());
     maxLevels = numOfLevels;
     maxRooms = numRooms;
     maxRow = maxR;
@@ -24,6 +25,8 @@ CreateRooms::CreateRooms(int maxR, int maxC, int numRooms, int numOfLevels) {
             grid[i][j] = grid[i][0] + maxCol * j;
     }
     aStar = new AstarSearch(maxR, maxC, grid);
+    tresurePosList.resize(maxLevels);
+    enemyPosList.resize(maxLevels);
     srand(time(NULL));
     ClearGrid();
     InitCreation();
@@ -35,8 +38,11 @@ void CreateRooms::InitCreation() {
     {
         SpawnRooms(i, maxRooms);
         Graphs.push_back(graph);
+        SpawnEntities(Graphs[i], i);
         findAllCorridors(Graphs[i], Graphs[i][0].first.first, i);
+		
         CleanNotConectedNodes(Graphs[i], i);
+        
         graph.clear();
     }
 }
@@ -62,7 +68,7 @@ void CreateRooms::SpawnRooms(int nivel, int numOfRooms) {
             continue;
         }
         int roomsMultiplier = 1;
-        // Geração aleatória de posição e tamanho
+        // GeraÃ§Ã£o aleatÃ³ria de posiÃ§Ã£o e tamanho
         if (numOfRooms < 100) {
             roomsMultiplier = 4;
         }
@@ -83,7 +89,7 @@ void CreateRooms::SpawnRooms(int nivel, int numOfRooms) {
             continue;
         }
 
-        // Criação da sala e adição ao grafo
+        // CriaÃ§Ã£o da sala e adiÃ§Ã£o ao grafo
         if (i == 0) {
             graph.emplace_back(std::make_pair(std::make_pair(50, 10), std::make_pair(5, 5)), 4);
         }
@@ -93,7 +99,7 @@ void CreateRooms::SpawnRooms(int nivel, int numOfRooms) {
     }
 }
 
-// Verifica se há espaço disponível para a sala
+// Verifica se hÃ¡ espaÃ§o disponÃ­vel para a sala
 bool CreateRooms::CanPlaceRoom(int nivel, int r1, int r2, int width, int height) {
     for (int step = 0; step < maxSteps; step++) {
         for (int d = 0; d < 9; d++) {
@@ -115,9 +121,14 @@ bool CreateRooms::CanPlaceRoom(int nivel, int r1, int r2, int width, int height)
 
 // Posiciona a sala na grade e define paredes/portas
 void CreateRooms::PlaceRoom(int nivel, int r1, int r2, int width, int height) {
-    // Preenche a sala com chão
+
+    // Preenche a sala com chÃ£o
     for (int j = -width / 2; j < width / 2; j++) {
         for (int k = -height / 2; k < height / 2; k++) {
+            if (grid[nivel][r1 + j][r2 + k] == TileType::Treasure || grid[nivel][r1 + j][r2 + k] == TileType::Enemy)
+            {
+                continue;
+            }
             grid[nivel][r1 + j][r2 + k] = TileType::Floor;
         }
     }
@@ -136,7 +147,6 @@ void CreateRooms::PlaceRoom(int nivel, int r1, int r2, int width, int height) {
 void CreateRooms::SpawnStartAndStairs()
 {
     for (int i = 0; i < maxLevels; i++) {
-
         for (int j = -(int)(5 / 2); j < (int)(5 / 2); j++)
         {
             for (int k = -(int)(5 / 2); k < (int)(5 / 2); k++)
@@ -214,6 +224,40 @@ void CreateRooms::CleanNotConectedNodes(vector<pair<pair<pair<int, int>, pair<in
     }
 }
 
+pair<int, int> CreateRooms::PickByWeight(vector<Candidate>& candidates, std::mt19937& gen)
+{
+    if (candidates.empty())
+    {
+        return { -1, -1 };
+    }
+
+    float totalWeight = 0.0f;
+
+    for (auto& c : candidates)
+        totalWeight += c.score;
+
+    if (totalWeight <= 0.0f)
+    {
+        std::uniform_int_distribution<int> dist(0, candidates.size() - 1);
+        return candidates[dist(gen)].pos;
+    }
+
+    std::uniform_real_distribution<float> dist(0.0f, totalWeight);
+    float r = dist(gen);
+
+    float accumulated = 0.0f;
+
+    for (auto& c : candidates)
+    {
+        accumulated += c.score;
+
+        if (r <= accumulated)
+            return c.pos;
+    }
+
+    return candidates.back().pos;
+}
+
 void CreateRooms::UpdateDoorsClosedNumber(pair<pair<pair<int, int>, pair<int, int>>, int>& Room, int level)
 {
     int numOfOpenedDoors = 4;
@@ -234,6 +278,114 @@ void CreateRooms::UpdateDoorsClosedNumber(pair<pair<pair<int, int>, pair<int, in
     }
 
     Room.second = numOfOpenedDoors;
+}
+
+void CreateRooms::SpawnTreasures( vector<pair<pair<pair<int, int>, pair<int, int>>, int>>& graph, int level)
+{
+    vector<Candidate> candidates;
+
+	for (int t = 0; t < 1 + rand() % 3; t++) // rand treasure between 1 and 3
+    {
+        pair<int, int> bestRoom;
+        float bestScore = -FLT_MAX;
+
+        for (auto& room : graph)
+        {
+            pair<int, int> pos = room.first.first;
+
+            if (pos.first == 50 && pos.second == 10)
+                continue;
+            if (std::find(tresurePosList[level].begin(),
+                tresurePosList[level].end(),
+                pos) != tresurePosList[level].end())
+                continue;
+            float score = MathAux::CalculateTreasureScore(
+                5.0f, // distWeight
+                20.0f, // repulsionRadius
+				8.0f, // repulsionWeight
+                pos,
+                make_pair(50, 10),
+                tresurePosList[level]
+            );
+
+            if (score > bestScore)
+            {
+                bestScore = score;
+                bestRoom = pos;
+            }
+            if (bestScore == -FLT_MAX) {
+                continue;
+            }
+            candidates.push_back({ pos, max(score, 0.1f) });
+        }
+
+        pair<int, int> chosen = PickByWeight(candidates, gen);
+
+        tresurePosList[level].push_back(chosen);
+        grid[level][chosen.first][chosen.second] = TileType::Treasure;
+
+    }
+}
+
+void CreateRooms::SpawnEnemies( vector<pair<pair<pair<int, int>, pair<int, int>>, int>>& graph, int level)
+{
+    vector<Candidate> candidates;
+	for (int e = 0; e < 3 + rand() % 4; e++) // rand enemy between 3 and 6
+    {
+        pair<int, int> bestRoom;
+        float bestScore = -FLT_MAX;
+
+        for (auto& room : graph)
+        {
+            pair<int, int> pos = room.first.first;
+
+            if (pos.first == 50 && pos.second == 10)
+                continue;
+            if (grid[level][pos.first][pos.second] == TileType::Treasure)
+                continue;
+            if (std::find(enemyPosList[level].begin(),
+                enemyPosList[level].end(),
+                pos) != enemyPosList[level].end())
+                continue;
+            float score = MathAux::CalculateEnemyScore(
+                30.0f,  // attractionWeight (treasure)
+                25.0f,  // attractionRadius
+                40.0f,  // repulsionWeight (enemy)
+                20.0f,  // repulsionRadius
+                pos,
+                tresurePosList[level],
+                enemyPosList[level]
+            );
+
+            if (score > bestScore)
+            {
+                bestScore = score;
+                bestRoom = pos;
+            }
+            if (bestScore == -FLT_MAX) {
+                continue; 
+            }
+            candidates.push_back({ pos, max(score, 0.1f) });
+        }
+
+        pair<int, int> chosen = PickByWeight(candidates, gen);
+
+        enemyPosList[level].push_back(chosen);
+        if (grid[level][chosen.first][chosen.second] == TileType::Treasure) {
+            grid[level][chosen.first + 1][chosen.second + 1] = TileType::Enemy;
+        }
+        else {
+            grid[level][chosen.first][chosen.second] = TileType::Enemy;
+        }
+       
+
+    }
+}
+
+void CreateRooms::SpawnEntities(vector<pair<pair<pair<int, int>, pair<int, int>>, int>>& graph, int level)
+{
+    CreateRooms::SpawnTreasures(graph, level);
+	CreateRooms::SpawnEnemies(graph, level);
 }
 
 void CreateRooms::findAllCorridors(vector<pair<pair<pair<int, int>, pair<int, int>>, int>>& pGraph, Pair nodeToStart, int level)

@@ -1,6 +1,8 @@
 #ifndef __CREATEROOMS__H__
 #define __CREATEROOMS__H__
 
+#include "gl_canvas2d.h"
+
 #include <iostream>
 #include <math.h>
 #include <stdio.h>
@@ -8,6 +10,7 @@
 #include <cstdlib>
 #include <time.h>  
 #include <vector>
+#include <random>
 
 //Para incluir dar quickfix e adicionar isso C:\MinGW\lib\gcc\mingw32\6.3.0\include\c++\mingw32
 #include <stack>
@@ -15,14 +18,23 @@
 #include<list>
 #include "TileTypeEnum.h"
 #include "AstarSearch.h"
+#include "MathAux.h"
 
 using namespace std;
+struct Candidate
+{
+	pair<int, int> pos;
+	float score;
+};
 
 class CreateRooms {
 
 public:
+	mt19937 gen;
 	int*** grid;
 	vector<vector<pair<pair<pair<int, int>, pair<int, int>>, int>>> Graphs;
+	vector<vector<pair<int, int>>> tresurePosList;
+	vector<vector<pair<int, int>>> enemyPosList;
 
 	CreateRooms(int maxR, int maxC, int numRooms, int numOfLevels);
 
@@ -31,6 +43,7 @@ public:
 	void ClearGrid();
 	//Spawn Rooms and begin corridor generation, after that remove any room that is not connected
 	void InitCreation();
+	
 private:
 	vector<pair<pair<pair<int, int>, pair<int, int>>, int>> graph;
 	pair<pair<pair<int, int>, pair<int, int>>, int> node;
@@ -45,6 +58,7 @@ private:
 	int maxRooms;
 	AstarSearch* aStar;
 
+	
 	//Create randomly rooms, saving in pairs with position information (X,Y) and size (W,H)
 	void SpawnRooms(int nivel, int numOfRooms);
 	bool CanPlaceRoom(int nivel, int r1, int r2, int width, int height);
@@ -58,6 +72,11 @@ private:
 	void UpdateDoorsClosedNumber(pair<pair<pair<int, int>, pair<int, int>>, int>& Room, int level);
 	//Function that calculate the distance between the rooms and call the A* search to trace the corridor
 	void findAllCorridors(vector<pair<pair<pair<int, int>, pair<int, int>>, int>>& pGraph, Pair nodeToStart, int level);
+	void SpawnEntities(vector<pair<pair<pair<int, int>, pair<int, int>>, int>>& graph, int level);
+	void SpawnEnemies(vector<pair<pair<pair<int, int>, pair<int, int>>, int>>& graph, int level);
+	void SpawnTreasures(vector<pair<pair<pair<int, int>, pair<int, int>>, int>>& graph, int level);
+	pair<int, int> PickByWeight(vector<Candidate>& candidates, std::mt19937& gen);
+
 };
 
 #endif

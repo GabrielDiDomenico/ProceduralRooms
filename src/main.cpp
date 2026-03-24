@@ -48,7 +48,8 @@ void printGraph(int levelToShow)
     if (rooms->Graphs.size() > 1) {
         for (int j = 0; j < rooms->Graphs[levelToShow].size(); j++)
         {
-            CV::circleFill(rooms->Graphs[levelToShow][j].first.first.first * 5, rooms->Graphs[levelToShow][j].first.first.second * 5, 4, 20);
+
+            CV::circleFill(rooms->Graphs[levelToShow][j].first.first.first * drawRooms->zoom, rooms->Graphs[levelToShow][j].first.first.second * drawRooms->zoom, 4, 20);
         }
 
         std::string level = "Level: ";
@@ -64,6 +65,7 @@ void render()
 {
     drawRooms->DrawRoomsOnCanvas();
     printGraph(drawRooms->levelToShow);
+	CV::circleFill(50, 10, 4, 20);
 }
 
 void keyboard(int key)
@@ -181,17 +183,19 @@ void ConfigurationInfo() {
 void ChangeConsoleLanguage() {
     if (changeLang && currLang == 0) {
         system("cls");
-        PrintConsoleInformationPortuguese();
-        ConfigurationInfo();
         changeLang = false;
         currLang = 1;
+        PrintConsoleInformationPortuguese();
+        ConfigurationInfo();
+        
     }
     else {
         system("cls");
-        PrintConsoleInformationEnglish();
-        ConfigurationInfo();
         changeLang = false;
         currLang = 0;
+        PrintConsoleInformationEnglish();
+        ConfigurationInfo();
+        
     }
 }
 
