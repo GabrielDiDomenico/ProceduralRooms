@@ -10,12 +10,16 @@
 
 using namespace std;
 
-CreateRooms::CreateRooms(int maxR, int maxC, int numRooms, int numOfLevels) {
+CreateRooms::CreateRooms(int maxR, int maxC, int numRooms, int numOfLevels, int lEnemy, int hEnemy, int lTreasure, int hTreasure) {
     gen = std::mt19937(std::random_device{}());
     maxLevels = numOfLevels;
     maxRooms = numRooms;
     maxRow = maxR;
     maxCol = maxC;
+	lowEnemy = lEnemy;
+	highEnemy = hEnemy;
+	lowTreasure = lTreasure;
+	highTreasure = hTreasure;
     grid = (int***)malloc(numOfLevels * sizeof(int**));
 
     for (int i = 0; i < numOfLevels; i++) {
@@ -186,41 +190,41 @@ void CreateRooms::SpawnStartAndStairs()
 }
 
 
-void CreateRooms::CleanNotConectedNodes(vector<pair<pair<pair<int, int>, pair<int, int>>, int>>& pGraph, int level)
-{
+void CreateRooms::CleanNotConectedNodes(vector<pair<pair<pair<int, int>, pair<int, int>>, int>>& pGraph, int level) {
 
-    for (int i = 0; i < pGraph.size(); i++)
-    {
-        int r1 = pGraph[i].first.first.first;
-        int r2 = pGraph[i].first.first.second;
-        int roomSizeW = pGraph[i].first.second.first;
-        int roomSizeH = pGraph[i].first.second.second;
-        if (pGraph[i].second < 4) {
-            return;
-        }
-        for (int j = -(int)(pGraph[i].first.second.first / 2); j <= (int)(pGraph[i].first.second.first / 2); j++)
-        {
-            for (int k = -(int)(pGraph[i].first.second.second / 2); k <= (int)(pGraph[i].first.second.second / 2); k++)
-            {
-                grid[level][j + r1][k + r2] = TileType::Empty;
+    for (const auto& room : pGraph) {
+        int r1 = room.first.first.first;
+        int r2 = room.first.first.second;
+        int halfW = room.first.second.first / 2;
+        int halfH = room.first.second.second / 2;
+
+        bool isConnected = false;
+
+        for (int j = -halfW; j <= halfW; j++) {
+            if (grid[level][r1 + j][r2 - halfH] == TileType::ClosedDoor ||
+                grid[level][r1 + j][r2 + halfH] == TileType::ClosedDoor) {
+                isConnected = true;
+                break;
             }
         }
 
-        for (int j = -(int)(roomSizeH / 2); j <= (int)(roomSizeH / 2); j++)
-        {
-
-
-            grid[level][j + r1][r2 + (int)(roomSizeH / 2)] = TileType::Empty;
-
+        if (!isConnected) {
+            for (int k = -halfH; k <= halfH; k++) {
+                if (grid[level][r1 - halfW][r2 + k] == TileType::ClosedDoor ||
+                    grid[level][r1 + halfW][r2 + k] == TileType::ClosedDoor) {
+                    isConnected = true;
+                    break;
+                }
+            }
         }
 
-        for (int k = -(int)(roomSizeW / 2); k <= (int)(roomSizeW / 2); k++)
-        {
-
-            grid[level][r1 + (int)(roomSizeW / 2)][r2 + k] = TileType::Empty;
-
+        if (!isConnected) {
+            for (int j = -halfW; j <= halfW; j++) {
+                for (int k = -halfH; k <= halfH; k++) {
+                    grid[level][r1 + j][r2 + k] = TileType::Empty;
+                }
+            }
         }
-
     }
 }
 
@@ -284,7 +288,7 @@ void CreateRooms::SpawnTreasures( vector<pair<pair<pair<int, int>, pair<int, int
 {
     vector<Candidate> candidates;
 
-	for (int t = 0; t < 1 + rand() % 3; t++) // rand treasure between 1 and 3
+	for (int t = 0; t < lowTreasure + rand() % highTreasure; t++)
     {
         pair<int, int> bestRoom;
         float bestScore = -FLT_MAX;
@@ -330,7 +334,7 @@ void CreateRooms::SpawnTreasures( vector<pair<pair<pair<int, int>, pair<int, int
 void CreateRooms::SpawnEnemies( vector<pair<pair<pair<int, int>, pair<int, int>>, int>>& graph, int level)
 {
     vector<Candidate> candidates;
-	for (int e = 0; e < 3 + rand() % 4; e++) // rand enemy between 3 and 6
+	for (int e = 0; e < lowEnemy + rand() % highEnemy; e++) 
     {
         pair<int, int> bestRoom;
         float bestScore = -FLT_MAX;

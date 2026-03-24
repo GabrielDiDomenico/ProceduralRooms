@@ -29,16 +29,21 @@ To test this code run the make file so all depencies are called correctly
 #include "DrawRooms.h"
 #include <regex>
 
+
 int screenWidth = 1000, screenHeight = 1000; 
 int mouseX, mouseY;
 int maxGridHeight = 100;
 int maxGridWidth = 100;
-int maxLevels = 1;
-int maxRooms = 10;
+int maxLevels = 3;
+int maxRooms = 100*0.8;
+int lowEnemy = 3;
+int highEnemy = 6;
+int lowTreasure = 2;
+int highTreasure = 4;
 bool changeLang = false;
 bool currLang = 0;
 string userInput;
-string roomDensity;
+string roomDensity = "High";
 CreateRooms* rooms = NULL;
 DrawRooms* drawRooms = NULL;
 
@@ -46,12 +51,7 @@ void printGraph(int levelToShow)
 {
     CV::color(0, 1, 0);
     if (rooms->Graphs.size() > 1) {
-        for (int j = 0; j < rooms->Graphs[levelToShow].size(); j++)
-        {
-
-            CV::circleFill(rooms->Graphs[levelToShow][j].first.first.first * drawRooms->zoom, rooms->Graphs[levelToShow][j].first.first.second * drawRooms->zoom, 4, 20);
-        }
-
+       
         std::string level = "Level: ";
 
         std::string levelAndNumber = level + std::to_string(levelToShow);
@@ -65,7 +65,7 @@ void render()
 {
     drawRooms->DrawRoomsOnCanvas();
     printGraph(drawRooms->levelToShow);
-	CV::circleFill(50, 10, 4, 20);
+
 }
 
 void keyboard(int key)
@@ -168,14 +168,20 @@ void PrintConsoleInformationPortuguese() {
 void ConfigurationInfo() {
     cout << "\n";
     if (currLang == 0) {
-        cout << "Current Dungeon Configuration: " << maxGridWidth << "x" << maxGridWidth << " "
-            << "Number of levels: " << maxLevels << " "
-            << "Room Density: " << roomDensity << endl;
+        cout << "Current Dungeon Configuration: \n Grid Size: " << maxGridWidth << "x" << maxGridWidth << " | "
+            << "Number of levels: " << maxLevels << " | "
+			<< "Room Density: " << roomDensity << " | "
+			<< "Range of Enemies: " << lowEnemy << " - " << highEnemy << " | "
+            << "Range of Treasures: " << lowTreasure << " - " << highTreasure
+            << endl;
     }
     else {
-        cout << "Configuracao da Dungeon atual: " << maxGridWidth << "x" << maxGridWidth << " "
-            << "Numero de niveis: " << maxLevels << " "
-            << "Quantidade de salas: " << roomDensity << endl;
+        cout << "Configuracao da Dungeon atual: \n Tamanho do grid: " << maxGridWidth << "x" << maxGridWidth << " | "
+            << "Numero de niveis: " << maxLevels << " | "
+            << "Quantidade de salas: " << roomDensity << " | "
+            << "Intervalo de inimigos: " << lowEnemy << " - " << highEnemy << " | "
+            << "Intervalo de tesouros: " << lowTreasure << " - " << highTreasure
+            << endl;
     }
 }
 
@@ -199,26 +205,42 @@ void ChangeConsoleLanguage() {
     }
 }
 
-bool validateAndExtract(const string& input, int& val1, int& val2, int& val3) {
-    regex pattern(R"((\d+)x(\d+)x(\d+))");
-    smatch match;
+bool validateAndExtract(const std::string& input, int& val1, int& val2, int& val3, int& val4, int& val5, int& val6, int& val7) {
 
-    if (regex_match(input, match, pattern)) {
-        val1 = stoi(match[1].str());
-        val2 = stoi(match[2].str());
-        val3 = stoi(match[3].str());
+    std::regex pattern(R"(^(\d+)x(\d+)x(\d+)x(\d+)(?:,(\d+))?x(\d+)(?:,(\d+))?$)");
+    std::smatch match;
 
-
-        if ((val1 >= 1 && val1 <= 1500) && (val2 >= 1 && val2 <= 50) && (val3 >= 1 && val3 <= 3)) {
-            return true;
+    if (std::regex_match(input, match, pattern)) {
+        val1 = std::stoi(match[1].str());
+        val2 = std::stoi(match[2].str());
+        val3 = std::stoi(match[3].str());
+        val4 = std::stoi(match[4].str());
+        if (match[5].matched) {
+            val5 = std::stoi(match[5].str());
         }
+        else {
+            val5 = val4;
+        }
+        val6 = std::stoi(match[6].str());
+        if (match[7].matched) {
+            val7 = std::stoi(match[7].str());
+        }
+        else {
+            val7 = val6;
+        }
+
+        bool v1_3 = (val1 >= 1 && val1 <= 1500) && (val2 >= 1 && val2 <= 50) && (val3 >= 1 && val3 <= 3);
+        bool v4_5 = (val4 >= 1 && val4 <= 30) && (val5 >= 1 && val5 <= 30) && (val4 <= val5);
+        bool v6_7 = (val6 >= 1 && val6 <= 30) && (val7 >= 1 && val7 <= 30) && (val6 <= val7);
+
+        return v1_3 && v4_5 && v6_7;
     }
+
     return false;
 }
 
 int main(void)
 {
-    roomDensity = "low";
     PrintConsoleInformationEnglish();
     ConfigurationInfo();
     while (true) {
@@ -231,7 +253,7 @@ int main(void)
         if (userInput == "w") {
             if (rooms == NULL) {
                 currLang == 0 ? cout << "Creating Dungeon...." : cout << "Criando Dungeon....";
-                rooms = new CreateRooms(maxGridWidth, maxGridHeight, maxRooms, maxLevels);
+                rooms = new CreateRooms(maxGridWidth, maxGridHeight, maxRooms, maxLevels, lowEnemy, highEnemy, lowTreasure, highTreasure);
                 drawRooms = new DrawRooms(rooms->grid, maxGridWidth, maxGridHeight, maxLevels, 1);
                 cout << "\n";
                 currLang == 0 ? cout << "Dungeon Created" << endl : cout << "Dungeon Criada" << endl;
@@ -254,24 +276,28 @@ int main(void)
         if (userInput == "f") {
             cout << "\n";
             string input;
-            int promptGridSize, promptLevels, promptRooms;
+            int promptGridSize, promptLevels, promptRooms, promptLowEnemies, promptHighEnemies, promptLowTreasures, prompthighTreasures;
 
            
             currLang == 0 ?
-                cout << "Type grid size, level number and density value (1 - low, 2 - medium, 3 - max)" << endl :
-                cout << "Digite tamanho do grid, numro de niveis e o valor de densidade (1 - pouca, 2 - media, 3 - maxima)" << endl;
+                cout << "Type grid size, number of levels, density room value (1 - low, 2 - medium, 3 - max), range of enemies, range of trasures" << endl :
+                cout << "Digite tamanho do grid, numero de niveis, valor de densidade de quartos (1 - pouca, 2 - media, 3 - maxima), intervalo de inimigos e intervalo de tesouros" << endl;
             currLang == 0 ?
-                cout << "Use the format(1-1500)x(1-50)x(1-3): " :
-                cout << "Utilize o formato (1-1500)x(1-50)x(1-3): ";
+                cout << "Use the format (1-1500)x(1-50)x(1-3)x(1-30,1-30)x(1-30,1-30), ex-> 100x3x3x3,6x2,8: " :
+                cout << "Utilize o formato (1-1500)x(1-50)x(1-3)x(1-30,1-30)x(1-30,1-30), ex-> 100x3x3x3,6x2,8: ";
             
             while (true) {
                 
                 getline(cin, input);
 
-                if (validateAndExtract(input, promptGridSize, promptLevels, promptRooms)) {
+                if (validateAndExtract(input, promptGridSize, promptLevels, promptRooms, promptLowEnemies, promptHighEnemies, promptLowTreasures, prompthighTreasures)) {
                     maxGridWidth = promptGridSize;
                     maxGridHeight = promptGridSize;
                     maxLevels = promptLevels;
+                    lowEnemy = promptLowEnemies;
+					highEnemy = promptHighEnemies;
+					lowTreasure = promptLowTreasures;
+					highTreasure = prompthighTreasures;
                     
                     switch (promptRooms) {
                         case 1:

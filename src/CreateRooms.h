@@ -36,11 +36,12 @@ public:
 	vector<vector<pair<int, int>>> tresurePosList;
 	vector<vector<pair<int, int>>> enemyPosList;
 
-	CreateRooms(int maxR, int maxC, int numRooms, int numOfLevels);
+	CreateRooms(int maxR, int maxC, int numRooms, int numOfLevels, int lEnemy, int hEnemy, int lTreasure, int hTreasure);
 
 	int*** GetGrid();
 	//Reset all info on the grid matrix and clear the Graph vector
 	void ClearGrid();
+	
 	//Spawn Rooms and begin corridor generation, after that remove any room that is not connected
 	void InitCreation();
 	
@@ -56,6 +57,10 @@ private:
 	int maxCol;
 	int maxLevels;
 	int maxRooms;
+	int highEnemy;
+	int lowEnemy;
+	int highTreasure;
+	int lowTreasure;
 	AstarSearch* aStar;
 
 	

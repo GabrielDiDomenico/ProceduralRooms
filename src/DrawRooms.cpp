@@ -27,7 +27,11 @@ void DrawRooms::DrawRoomsOnCanvas() {
     {
         for (int j = 0; j < gridWidth - 1; j++)
         {
-            if (grid[levelToShow][i][j] == TileType::Wall) {
+            if (grid[levelToShow][i][j] == TileType::Enemy) {
+                CV::color(1, 0, 0);
+                CV::rectFill((i + 1 + shiftUpDown) * zoom, (j + 1 + shiftRightLeft) * zoom, (i + 1 + shiftUpDown + 1) * zoom, (j + 1 + shiftRightLeft + 1) * zoom);
+            }
+            if (grid[levelToShow][i][j] == TileType::Wall || grid[levelToShow][i][j] == TileType::Door) {
                 CV::color(0, 0, 0);
                 CV::rectFill((i + shiftUpDown) * zoom, (j + shiftRightLeft) * zoom, (i + shiftUpDown + 1) * zoom, (j + shiftRightLeft + 1) * zoom);
             }
@@ -35,8 +39,8 @@ void DrawRooms::DrawRoomsOnCanvas() {
                 CV::color(0.8, 0.5, 0.2);
                 CV::rectFill((i + shiftUpDown) * zoom, (j + shiftRightLeft) * zoom, (i + shiftUpDown + 1) * zoom, (j + shiftRightLeft + 1) * zoom);
             }
-            if (grid[levelToShow][i][j] == TileType::Door || grid[levelToShow][i][j] == TileType::ClosedDoor) {
-                CV::color(1, 0, 0);
+            if (grid[levelToShow][i][j] == TileType::ClosedDoor) {
+                CV::color(0, 1, 0);
                 CV::rectFill((i + shiftUpDown) * zoom, (j + shiftRightLeft) * zoom, (i + shiftUpDown + 1) * zoom, (j + shiftRightLeft + 1) * zoom);
             }
             if (grid[levelToShow][i][j] == TileType::Corridor) {
@@ -47,10 +51,7 @@ void DrawRooms::DrawRoomsOnCanvas() {
                 CV::color(1, 1, 0);
                 CV::rectFill((i + shiftUpDown) * zoom, (j + shiftRightLeft) * zoom, (i + shiftUpDown + 1) * zoom, (j + shiftRightLeft + 1) * zoom);
             }
-            if (grid[levelToShow][i][j] == TileType::Enemy) {
-                CV::color(0, 0, 0);
-                CV::rectFill((i + 1 + shiftUpDown) * zoom, (j + 1 + shiftRightLeft) * zoom, (i + 1 + shiftUpDown + 1) * zoom, (j + 1 + shiftRightLeft + 1) * zoom);
-            }
+            
         }
     }
 }
@@ -73,13 +74,13 @@ void DrawRooms::DrawRoomsOnFile() {
         {
             for (int j = 0; j < gridWidth - 1; j++)
             {
-                if (grid[lvl][i][j] == TileType::Wall) {
+                if (grid[levelToShow][i][j] == TileType::Wall || grid[levelToShow][i][j] == TileType::Door) {
                     file << "W";
                 }
                 else if (grid[lvl][i][j] == TileType::Floor) {
                     file << "F";
                 }
-                else if (grid[lvl][i][j] == TileType::Door || grid[lvl][i][j] == TileType::ClosedDoor) {
+                else if (grid[lvl][i][j] == TileType::ClosedDoor) {
                     file << "D";
                 }
                 else if (grid[lvl][i][j] == TileType::Corridor) {
