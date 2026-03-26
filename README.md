@@ -33,5 +33,5 @@ Link to the VS Studio Tutorial: https://www.youtube.com/watch?v=ZF59t7HX24s
 - [x]  Import the generated dungeon to a text file
 - [x]  Dungeon creation via terminal  
 - [x]  Add dungeon configuration from terminal
-- [ ]  Adding the possibility to spawn treasures, updates, merchants and enemies
-- [ ]  Increase and decrease enemies spawn based on treasure/update position
+- [x]  Adding the possibility to spawn treasures, updates, merchants and enemies
+- [x]  Increase and decrease enemies spawn based on treasure/update position
