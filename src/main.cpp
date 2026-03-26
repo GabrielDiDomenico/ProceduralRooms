@@ -11,8 +11,7 @@
 
 /*
 
-This class use the Canvas2D for visualization, this is an outdated library
-that uses old openGL, it is bad, but it is simple.
+This class use the Canvas2D for visualization
 
 To test this code run the make file so all depencies are called correctly
 

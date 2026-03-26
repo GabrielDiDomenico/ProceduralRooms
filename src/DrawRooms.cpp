@@ -29,7 +29,7 @@ void DrawRooms::DrawRoomsOnCanvas() {
         {
             if (grid[levelToShow][i][j] == TileType::Enemy) {
                 CV::color(1, 0, 0);
-                CV::rectFill((i + 1 + shiftUpDown) * zoom, (j + 1 + shiftRightLeft) * zoom, (i + 1 + shiftUpDown + 1) * zoom, (j + 1 + shiftRightLeft + 1) * zoom);
+                CV::rectFill((i + shiftUpDown) * zoom, (j + shiftRightLeft) * zoom, (i + shiftUpDown + 1) * zoom, (j + shiftRightLeft + 1) * zoom);
             }
             if (grid[levelToShow][i][j] == TileType::Wall || grid[levelToShow][i][j] == TileType::Door) {
                 CV::color(0, 0, 0);
